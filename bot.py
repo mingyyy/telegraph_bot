@@ -21,5 +21,11 @@ async def start(update: Update, context: CallbackContext):
 app.add_handler(CommandHandler("start", start))
 
 # Run the bot
+WEBHOOK_URL = "https://news-bot-for-ming.onrender.com"
+
 if __name__ == "__main__":
-    app.run_polling()
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=5000,
+        webhook_url=f"{WEBHOOK_URL}/{TELEGRAM_BOT_TOKEN}"
+    )
