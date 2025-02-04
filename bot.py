@@ -2,15 +2,20 @@ from flask import Flask, request
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
 import os
-import requests  # ✅ Add this import
+import requests  
 from dotenv import load_dotenv
+import asyncio  
 
 # Load .env file
 load_dotenv()
 
 # Get bot token and Render URL from environment variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-RENDER_URL = "https://news-bot-for-ming.onrender.com"  # Change this to your actual Render URL
+RENDER_URL = "https://news-bot-for-ming.onrender.com"  # Change to your actual Render URL
+
+# Ensure bot token exists
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("❌ TELEGRAM_BOT_TOKEN is missing! Set it in your environment variables.")
 
 # Create Flask app
 app = Flask(__name__)
@@ -24,12 +29,14 @@ async def start(update: Update, context: CallbackContext):
 
 bot_app.add_handler(CommandHandler("start", start))
 
-# Webhook endpoint
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """Handles incoming webhook updates from Telegram."""
     update = Update.de_json(request.get_json(), bot_app.bot)
-    bot_app.process_update(update)
+    
+    # ✅ Fix: Properly handle async function in Flask
+    asyncio.create_task(bot_app.process_update(update))
+    
     return "OK", 200
 
 # Function to set webhook
