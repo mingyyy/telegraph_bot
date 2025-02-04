@@ -31,8 +31,7 @@ def webhook():
 
 # Run Flask server
 if __name__ == "__main__":
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=5000,
-        webhook_url=f"{WEBHOOK_URL}/{TELEGRAM_BOT_TOKEN}"
+    app.run(
+        host="0.0.0.0",
+        port=5000
     )
