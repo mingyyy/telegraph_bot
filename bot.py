@@ -1,16 +1,19 @@
 from flask import Flask, request
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
-
 import os
+import requests  # ✅ Add this import
 from dotenv import load_dotenv
+
 # Load .env file
 load_dotenv()
 
+# Get bot token and Render URL from environment variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-RENDER_URL = "https://news-bot-for-ming.onrender.com"
+RENDER_URL = "https://news-bot-for-ming.onrender.com"  # Change this to your actual Render URL
 
-app = Flask(__name__)  # Create Flask app
+# Create Flask app
+app = Flask(__name__)
 
 # Create bot application
 bot_app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
@@ -22,7 +25,7 @@ async def start(update: Update, context: CallbackContext):
 bot_app.add_handler(CommandHandler("start", start))
 
 # Webhook endpoint
-@app.route(f"/webhook", methods=["POST"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
     """Handles incoming webhook updates from Telegram."""
     update = Update.de_json(request.get_json(), bot_app.bot)
