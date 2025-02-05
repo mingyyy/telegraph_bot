@@ -29,19 +29,20 @@ async def start(update: Update, context: CallbackContext):
 
 bot_app.add_handler(CommandHandler("start", start))
 
-# ✅ Fix: Add a Health Check Route to Prevent 404 Errors
+# Fix: Add a Health Check Route to Prevent 404 Errors
 @app.route("/", methods=["GET"])
 def home():
-    return "Bot is running!", 200  # ✅ Returns HTTP 200 instead of 404
+    return "Bot is running!", 200  # Returns HTTP 200 instead of 404
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """Handles incoming webhook updates from Telegram."""
     update = Update.de_json(request.get_json(), bot_app.bot)
-    
-    # ✅ Fix: Use thread-safe async function call
-    loop = asyncio.get_event_loop()
-    loop.create_task(bot_app.process_update(update))  # Correct way
+
+    # Fix: Always create a new event loop in Flask
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(bot_app.process_update(update))
 
     return "OK", 200
 
